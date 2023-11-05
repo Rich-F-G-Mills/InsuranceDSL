@@ -1,0 +1,6 @@
+﻿
+Note the following useful locations:
+
+Open CL API reference: https://registry.khronos.org/OpenCL/sdk/2.0/docs/man/xhtml/
+Function level API XMLs: https://registry.khronos.org/OpenCL/sdk/2.0/docs/man/
+OpenCL headers: https://github.com/KhronosGroup/OpenCL-Headers/blob/main/CL/cl.h

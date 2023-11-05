@@ -1,0 +1,3 @@
+
+It is assumed throughout that parsers will right-trim any whitespace.
+ * Consume any right-trailing spaces.

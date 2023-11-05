@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>InsuranceDSL</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Failures.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="Platforms.fs" />
+    <Compile Include="Devices.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.15.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.fsproj" />
+    <ProjectReference Include="..\OpenCL.NET.Interop\OpenCL.NET.Interop.csproj" />
+  </ItemGroup>
+
+</Project>

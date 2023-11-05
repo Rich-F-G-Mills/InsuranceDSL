@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+	  <RootNamespace>InsuranceDSL</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.15.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressionBuilder\ExpressionBuilder.fsproj" />
+    <ProjectReference Include="..\Implementation.Common\Implementation.Common.fsproj" />
+    <ProjectReference Include="..\Specification\Specification.fsproj" />
+  </ItemGroup>
+
+</Project>
