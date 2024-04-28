@@ -21,6 +21,22 @@ let main args =
             Code.parseString content
             |> Result.teeError (printfn "FAILED: %A")
 
+        let enums =
+            codeElements
+            |> List.choose (function | ParsedElement.StringEnumeration se -> Some se | _ -> None)
+
+        do  enums
+            |> List.iter (fun se ->
+                printfn "String Enum: '%s' ----->>>" se.Name
+
+                se.Levels
+                |> Map.iter (printfn "     '%s' = %s")
+
+                do  printf "\n"
+            )
+
+        do  printf "\n"
+
         let products =
             codeElements
             |> List.choose (function | ParsedElement.Product p -> Some p | _ -> None)
@@ -32,7 +48,9 @@ let main args =
                 p.DefinedVariables
                 |> Map.values
                 |> Seq.map (fun dv -> dv.Variable, dv.Expression)
-                |> Seq.iter (fun (v, e) -> printfn "     Variable '%s' = %A" v.UnderlyingVariable.Name e)
+                |> Seq.iter (fun (v, e) -> printfn "     Variable '%s' = %A\n" v.UnderlyingVariable.Name e)
+
+                do  printf "\n"
             )
 
         return 0

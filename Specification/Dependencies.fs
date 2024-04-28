@@ -228,6 +228,12 @@ module rec Dependencies =
                 bs |> Seq.collect VariableDependencyPairing_.processExpr
             | BooleanAccrualExpression.Not b ->
                 VariableDependencyPairing_.processExpr b
+            | BooleanAccrualExpression.Conditional (b, t, f) ->
+                seq {
+                    yield! VariableDependencyPairing_.processExpr b
+                    yield! VariableDependencyPairing_.processExpr t
+                    yield! VariableDependencyPairing_.processExpr f
+                }
 
         static member private processExpr (expr: ComparableAccrualExpressionPair) =
             match expr with
@@ -312,6 +318,8 @@ module rec Dependencies =
                 VariableDependencyPairing_.processExpr x
             | IntegerAccrualExpression.FromReal r ->
                 VariableDependencyPairing_.processExpr r
+            | IntegerAccrualExpression.StringLength s ->
+                VariableDependencyPairing_.processExpr s
 
         static member private processExpr (expr: RealAccrualExpression) =
             match expr with
@@ -454,6 +462,12 @@ module rec Dependencies =
                 bs |> Seq.collect VariableDependencyPairing_.processExpr
             | BooleanRollbackExpression.Not b ->
                 VariableDependencyPairing_.processExpr b
+            | BooleanRollbackExpression.Conditional (b, t, f) ->
+                seq {
+                    yield! VariableDependencyPairing_.processExpr b
+                    yield! VariableDependencyPairing_.processExpr t
+                    yield! VariableDependencyPairing_.processExpr f
+                }
 
         static member private processExpr (expr: ComparableRollbackExpressionPair) =
             match expr with
@@ -538,6 +552,8 @@ module rec Dependencies =
                 VariableDependencyPairing_.processExpr x
             | IntegerRollbackExpression.FromReal r ->
                 VariableDependencyPairing_.processExpr r
+            | IntegerRollbackExpression.StringLength s ->
+                VariableDependencyPairing_.processExpr s
 
         static member private processExpr (expr: RealRollbackExpression) =
             match expr with
@@ -680,6 +696,12 @@ module rec Dependencies =
                 bs |> Seq.collect VariableDependencyPairing_.processExpr
             | BooleanSingletonExpression.Not b ->
                 VariableDependencyPairing_.processExpr b
+            | BooleanSingletonExpression.Conditional (b, t, f) ->
+                seq {
+                    yield! VariableDependencyPairing_.processExpr b
+                    yield! VariableDependencyPairing_.processExpr t
+                    yield! VariableDependencyPairing_.processExpr f
+                }
 
         static member private processExpr (expr: ComparableSingletonExpressionPair) =
             match expr with
@@ -764,6 +786,8 @@ module rec Dependencies =
                 VariableDependencyPairing_.processExpr x
             | IntegerSingletonExpression.FromReal r ->
                 VariableDependencyPairing_.processExpr r
+            | IntegerSingletonExpression.StringLength s ->
+                VariableDependencyPairing_.processExpr s
 
         static member private processExpr (expr: RealSingletonExpression) =
             match expr with

@@ -1,5 +1,6 @@
 ﻿
 open System
+open System.IO
 open System.Text
 
 open FsToolkit.ErrorHandling
@@ -9,25 +10,38 @@ open OpenCL.NET
 
 
 result {
-    let! platforms =
+    let assembly =
+        System.Reflection.Assembly.GetCallingAssembly()
+
+    use stream =
+        assembly.GetManifestResourceStream ($"{assembly.GetName().Name}.program.cl")
+
+    use streamReader =
+        new StreamReader (stream)
+
+    let clProgram =
+        streamReader.ReadToEnd ()
+
+    do printfn "Program: %s" clProgram
+
+    let! platformIds =
         Platforms.getPlatformIds ()
 
-    let! platformInfo =
-        platforms
-        |> Seq.map Platforms.getPlatformInformation
-        |> Seq.sequenceResultM
-        |> Result.map Seq.toArray
-
-    printfn "Platform Info: %A" platformInfo
-
     let! deviceIds =
-        Devices.getDeviceIds platforms[0] Devices.DeviceType.All
+        Devices.getDeviceIds platformIds[0] Devices.DeviceType.Gpu
 
-    let! deviceInfo =
-        deviceIds
-        |> Seq.map (fun did -> Devices.getDeviceInformation (did, DeviceInformation.Version))
-        |> Seq.sequenceResultM
-        |> Result.map Seq.toArray
+    use! context =
+        Contexts.createContext deviceIds
 
-    printfn "Device Info: %A" deviceInfo
-} |> ignore
+    use! program =
+        Programs.createProgramWithSource context clProgram
+
+    let! devices =
+        Programs.ProgramInformation.get (program, Programs.Information.Devices)
+
+    do printfn "Ref count: %A" devices
+
+    return 0
+}
+|> Result.teeError (printfn "OpenCL Error: %A")
+|> ignore

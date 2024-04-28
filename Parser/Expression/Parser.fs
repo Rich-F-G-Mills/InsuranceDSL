@@ -21,6 +21,12 @@ type internal ExpressionParser (variables) as this =
     let (REAL_ACCRUAL_EXPRESSION', REAL_ACCRUAL_EXPRESSION_REF) =
         createParserForwardedToRef<RealAccrualExpression, unit> ()
 
+    let (STRING_ACCRUAL_EXPRESSION', STRING_ACCRUAL_EXPRESSION_REF) =
+        createParserForwardedToRef<StringAccrualExpression, unit> ()
+
+    let (DATE_ACCRUAL_EXPRESSION', DATE_ACCRUAL_EXPRESSION_REF) =
+        createParserForwardedToRef<DateAccrualExpression, unit> ()
+
 
     member _.Initialize () =
         let callableFactory =
@@ -36,6 +42,11 @@ type internal ExpressionParser (variables) as this =
         do REAL_ACCRUAL_EXPRESSION_REF.Value <-
             RealAccrualExpression.parse (this, callableFactory)
 
+        do STRING_ACCRUAL_EXPRESSION_REF.Value <-
+            StringAccrualExpression.parse (this, callableFactory)
+
+        do DATE_ACCRUAL_EXPRESSION_REF.Value <-
+            DateAccrualExpression.parse (this, callableFactory)
 
 
     interface IExpressionParser with
@@ -53,10 +64,10 @@ type internal ExpressionParser (variables) as this =
             REAL_ACCRUAL_EXPRESSION'
 
         member val STRING_ACCRUAL_EXPRESSION =
-            fail "TEST"
+            STRING_ACCRUAL_EXPRESSION'
 
         member val DATE_ACCRUAL_EXPRESSION =
-            fail "TEST"
+            DATE_ACCRUAL_EXPRESSION'
 
         member val INTEGER_ENUMERATION_ACCRUAL_EXPRESSION =
             fail "TEST"

@@ -112,6 +112,10 @@ module rec Expressions =
         | Years
 
 
+    // A date constant of '0' corresponds to the end of the following year.
+    let YearOrigin = 1899
+
+
     [<RequireQualifiedAccess; NoComparison>]
     type ComparableAccrualExpressionPair =
         | Integer of IntegerAccrualExpression * IntegerAccrualExpression
@@ -140,6 +144,7 @@ module rec Expressions =
         | And of BooleanAccrualExpression list
         | Or of BooleanAccrualExpression list
         | Not of BooleanAccrualExpression
+        | Conditional of BooleanAccrualExpression * True: BooleanAccrualExpression * False: BooleanAccrualExpression
 
         interface IExpression with
             member _.Type = VariableType.Boolean
@@ -159,6 +164,7 @@ module rec Expressions =
         | BinaryArithmeticOp of BinaryArithmeticOp * IntegerAccrualExpression * IntegerAccrualExpression
         | UnaryArithmeticOp of UnaryArithmeticOp * IntegerAccrualExpression
         | FromReal of RealAccrualExpression
+        | StringLength of StringAccrualExpression
 
         interface IExpression with
             member _.Type = VariableType.Integer
@@ -342,6 +348,7 @@ module rec Expressions =
         | And of BooleanRollbackExpression list
         | Or of BooleanRollbackExpression list
         | Not of BooleanRollbackExpression
+        | Conditional of BooleanRollbackExpression * True: BooleanRollbackExpression * False: BooleanRollbackExpression
 
         interface IExpression with
             member _.Type = VariableType.Boolean
@@ -361,6 +368,7 @@ module rec Expressions =
         | BinaryArithmeticOp of BinaryArithmeticOp * IntegerRollbackExpression * IntegerRollbackExpression
         | UnaryArithmeticOp of UnaryArithmeticOp * IntegerRollbackExpression
         | FromReal of RealRollbackExpression
+        | StringLength of StringRollbackExpression
 
         interface IExpression with
             member _.Type = VariableType.Integer
@@ -546,6 +554,7 @@ module rec Expressions =
         | And of BooleanSingletonExpression list
         | Or of BooleanSingletonExpression list
         | Not of BooleanSingletonExpression
+        | Conditional of BooleanSingletonExpression * True: BooleanSingletonExpression * False: BooleanSingletonExpression
 
         interface IExpression with
             member _.Type = VariableType.Boolean
@@ -565,6 +574,7 @@ module rec Expressions =
         | BinaryArithmeticOp of BinaryArithmeticOp * IntegerSingletonExpression * IntegerSingletonExpression
         | UnaryArithmeticOp of UnaryArithmeticOp * IntegerSingletonExpression
         | FromReal of RealSingletonExpression
+        | StringLength of StringSingletonExpression
 
         interface IExpression with
             member _.Type = VariableType.Integer

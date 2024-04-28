@@ -63,7 +63,7 @@ module internal Enumeration =
             let SINGLE_INHERITANCE =
                 EXTENDS >|+>. INHERITED_ENUM_NAME .>> WHITESPACE
 
-            manyTill SINGLE_INHERITANCE (notFollowedBy EXTENDS)
+            many SINGLE_INHERITANCE
 
         let private ENUM_LEVEL =
             ELEMENT_NAME .>|+> AS .>|+>. pint32 .>> WHITESPACE
@@ -134,7 +134,7 @@ module internal Enumeration =
             let SINGLE_INHERITANCE =
                 EXTENDS >|+>. INHERITED_ENUM_NAME .>> WHITESPACE
 
-            manyTill SINGLE_INHERITANCE (notFollowedBy EXTENDS)
+            many SINGLE_INHERITANCE
 
         let private ENUM_LEVEL =
             ELEMENT_NAME .>|+> AS .>|+>. QUOTED_TEXT .>> WHITESPACE

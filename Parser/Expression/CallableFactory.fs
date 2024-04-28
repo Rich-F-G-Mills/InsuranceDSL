@@ -24,6 +24,8 @@ type internal CallableFactory (expressionParser: IExpressionParser) =
             <@@ expressionParser.INTEGER_ACCRUAL_EXPRESSION @@>
         elif t = typeof<RealAccrualExpression> then
             <@@ expressionParser.REAL_ACCRUAL_EXPRESSION @@>
+        elif t = typeof<StringAccrualExpression> then
+            <@@ expressionParser.STRING_ACCRUAL_EXPRESSION @@>
         else
             failwith (sprintf "Unable to process callable with argument type '%s'." t.Name)
 

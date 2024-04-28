@@ -10,6 +10,7 @@ module Common =
     open Parser
 
     open FParsec
+    open FsToolkit.ErrorHandling
     open Specification.Variables
     open Specification.Expressions
 
@@ -194,13 +195,13 @@ module Common =
         }
 
 
-    let INTEGER_CONSTANT =
+    let internal INTEGER_LITERAL =
         pint32 .>> followedBy IDENTIFIER_BOUNDARY
 
-    let REAL_CONSTANT =
+    let internal REAL_LITERAL =
         pfloat .>> followedBy IDENTIFIER_BOUNDARY
 
-    let BOOLEAN_CONSTANT =
+    let internal BOOLEAN_LITERAL =
         let choices =
             [
                 skipString "TRUE" >>% true
@@ -209,3 +210,23 @@ module Common =
 
         choiceL choices "boolean constant"
         .>> followedBy IDENTIFIER_BOUNDARY
+
+    let internal STRING_LITERAL: Parser<_, unit> =
+        between (pchar '"') (pchar '"') (regex "[^\"]*")
+
+    let internal DATE_LITERAL: Parser<_, unit> =
+        let YMD =
+            parse {
+                let! (y, _, m, _, d) =
+                    tuple5 (manyMinMaxSatisfy 4 4 isDigit) (skipChar '-') (manyMinMaxSatisfy 1 2 isDigit) (skipChar '-') (manyMinMaxSatisfy 1 2 isDigit)
+
+                let (y', m', d') =
+                    int y, int m, int d
+
+                do! Result.requireTrue "Day component must be from 1 to 30" (1 <= d' && d' <= 30)
+                do! Result.requireTrue "Month component must be from 1 to 12" (1 <= m' && m' <= 12)
+
+                return d' + 30 * (m' - 1) + (y' - YearOrigin) * 30 * 12
+            }
+
+        between (pstring "<<") (pstring ">>") YMD

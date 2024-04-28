@@ -28,5 +28,6 @@ module internal Extensions =
 
         member _.Source (x: Parser<'TValue, 'TState>) =
             x
+
         member _.Source (x: Result<'T, string>) =
             x |> Result.either preturn failFatally

@@ -10,7 +10,8 @@ open Common
 module Devices =
 
     type DeviceId =
-        internal DeviceId of nativeint
+        internal DeviceId of IntPtr
+
 
     type private NativeDeviceType =
         Interop.Devices.DeviceType
@@ -49,10 +50,13 @@ module Devices =
         /// <summary>
         /// All OpenCL devices available in the system except <c>CL_DEVICE_TYPE_CUSTOM</c> devices.
         /// </summary>
-        | [<MapFromDeviceType(NativeDeviceType.All)>] All        
-
-        static member val internal toNativeStrict =
+        | [<MapFromDeviceType(NativeDeviceType.All)>] All      
+        
+    [<RequireQualifiedAccess>]
+    module DeviceType =
+        let internal toNativeStrict =
             createStrictMapperToNativeFromType<NativeDeviceType, DeviceType>
+
 
     let getDeviceIds (Platforms.PlatformId pid) deviceType =
         result {
@@ -76,6 +80,7 @@ module Devices =
     type private NativeDeviceGlobalMemoryCacheType =
         Interop.Devices.DeviceGlobalMemoryCacheType
 
+
     [<Sealed>]
     type private MapFromDeviceGlobalMemoryCacheTypeAttribute (cacheType) =
         inherit MapFromAttributeBase<NativeDeviceGlobalMemoryCacheType> (cacheType)
@@ -86,16 +91,22 @@ module Devices =
         | [<MapFromDeviceGlobalMemoryCacheType(NativeDeviceGlobalMemoryCacheType.ReadOnlyCache)>] ReadOnlyCache
         | [<MapFromDeviceGlobalMemoryCacheType(NativeDeviceGlobalMemoryCacheType.ReadWriteCache)>] ReadWriteCache
 
-        static member val internal fromNativeStrict =
+    [<RequireQualifiedAccess>]
+    module DeviceGlobalMemoryCacheType =
+        let internal fromNativeStrict =
             createStrictMapperFromNativeToType<NativeDeviceGlobalMemoryCacheType, DeviceGlobalMemoryCacheType>
    
-   [<RequireQualifiedAccess>]
+
+    [<RequireQualifiedAccess>]
     type DeviceProfile =
         | [<MapFromString("FULL_PROFILE")>] Full
         | [<MapFromString("EMBEDDED_PROFILE")>] Embedded
 
-        static member val internal fromString =
+    [<RequireQualifiedAccess>]
+    module DeviceProfile =
+        let internal fromString =
             createStrictMapperFromNativeToType<string, DeviceProfile>
+
 
     type DeviceVersion =
         { 
@@ -104,7 +115,7 @@ module Devices =
             Information: string
         }
 
-        static member private re: Regex =
+        static member val private re: Regex =
             new Regex (@"^OpenCL\s([0-9]+)\.([0-9]+)\s(.*)$")
 
         static member fromString versionStr =
@@ -122,69 +133,39 @@ module Devices =
     [<RequireQualifiedAccess>]
     module DeviceInformation =
 
-        type private NativeDeviceInformation =
-            Interop.Devices.DeviceInformation
-
-        type NonStringElement<'TReturn, 'TTransformed> =
-            internal | NonStringElement of NativeName: NativeDeviceInformation * Transformer: ('TReturn -> 'TTransformed)
-
-        type StringElement<'TTransformed> =
-            internal | StringElement of NativeName: NativeDeviceInformation * Transformer: (string -> 'TTransformed)
-
-
         let private splitSpaceDelimitedString (s: string) =
             s.Split (" ", StringSplitOptions.RemoveEmptyEntries)
             |> Array.toList
 
 
-        let (AddressBits: NonStringElement<uint32, _>) =
-            NonStringElement (NativeDeviceInformation.AddressBits, id)
+        type private NativeDeviceInformation =
+            Interop.Devices.DeviceInformation
 
-        let (CompilerAvailable: NonStringElement<bool, _>) =
-            NonStringElement (NativeDeviceInformation.CompilerAvailable, id)
+
+        let AddressBits: InformationMapper.ValueTypeInfo<_, uint32, _> =
+            InformationMapper.ValueTypeInfo (NativeDeviceInformation.AddressBits, id)
+
+        let CompilerAvailable: InformationMapper.ValueTypeInfo<_, bool, _> =
+            InformationMapper.ValueTypeInfo (NativeDeviceInformation.CompilerAvailable, id)
 
         let Extensions =
-            StringElement (NativeDeviceInformation.Extensions, splitSpaceDelimitedString)
+            InformationMapper.StringInfo (NativeDeviceInformation.Extensions, splitSpaceDelimitedString)
 
         let GlobalMemoryCacheType =
-            NonStringElement (NativeDeviceInformation.GlobalMemoryCacheType, Devices.DeviceGlobalMemoryCacheType.fromNativeStrict)
+            InformationMapper.ValueTypeInfo (NativeDeviceInformation.GlobalMemoryCacheType, DeviceGlobalMemoryCacheType.fromNativeStrict)
 
         let Name =
-            StringElement (NativeDeviceInformation.Name, id)
+            InformationMapper.StringInfo (NativeDeviceInformation.Name, id)
 
         let Profile =
-            StringElement (NativeDeviceInformation.Profile, DeviceProfile.fromString)
+            InformationMapper.StringInfo (NativeDeviceInformation.Profile, DeviceProfile.fromString)
 
         let Version =
-            StringElement (NativeDeviceInformation.Version, DeviceVersion.fromString)
+            InformationMapper.StringInfo (NativeDeviceInformation.Version, DeviceVersion.fromString)
 
 
-// Best we can do to get a static class.
-[<Sealed; AbstractClass>]
-type Devices () =
-    (*
-    The issue is that we need to call a different function depending on whether
-    the return type is a string or something else.
-    We cannot cast the string returned by 'extractString' to 'TReturn, even though
-    we can check via conditional that the types are the same. This would require the use of
-    Unsafe.As which adds the 'reference type' constraint to 'TReturn which isn't ideal!
-    Instead, we leverage the multiple dispatch approach offered via static class members.
-    *)
-    
-    static member getDeviceInformation (Devices.DeviceId did, element: DeviceInformation.StringElement<'TTransformed>) =
-        let (DeviceInformation.StringElement (nativeName, transformer)) = element
-        
-        let extractor (buffer, size) =
-            Interop.Devices.GetDeviceInformation (did, nativeName, size, buffer)
+    let DeviceInformation =
+        let mapper (DeviceId did, nativeRef, size, buffer) =
+            Interop.Devices.GetDeviceInformation (did, nativeRef, size, buffer)
 
-        extractString extractor
-        |> Result.map transformer
-
-    static member getDeviceInformation (Devices.DeviceId did, element: DeviceInformation.NonStringElement<'TReturn, 'TTransformed>) =
-        let (DeviceInformation.NonStringElement (nativeName, transformer)) = element
-        
-        let extractor (buffer, size) =
-            Interop.Devices.GetDeviceInformation (did, nativeName, size, buffer)
-
-        castFromBytes<'TReturn, _> extractor
-        |> Result.map transformer 
+        new InformationMapper<_, _>(mapper)

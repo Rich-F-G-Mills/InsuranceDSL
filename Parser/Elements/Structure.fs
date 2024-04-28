@@ -40,7 +40,7 @@ module internal Structure =
         let SINGLE_INHERITANCE =
             EXTENDS >|+>. INHERITED_STRUCTURE_NAME .>> WHITESPACE
 
-        manyTill SINGLE_INHERITANCE (notFollowedBy EXTENDS)
+        many SINGLE_INHERITANCE
 
     let private STRUCTURE_VARIABLE parserState =
         parse {
@@ -71,6 +71,7 @@ module internal Structure =
         }
 
     let private STRUCTURE_VARIABLES parserState =       
+        // The only thing we should see after all the variables is 'END STRUCTURE'. 
         many1Till (STRUCTURE_VARIABLE parserState) (followedBy END)
 
     let internal parse =

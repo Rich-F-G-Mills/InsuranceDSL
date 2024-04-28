@@ -17,6 +17,8 @@
     <Compile Include="Expression\BooleanAccrual.fs" />
     <Compile Include="Expression\IntegerAccrual.fs" />
     <Compile Include="Expression\RealAccrual.fs" />
+    <Compile Include="Expression\StringAccrual.fs" />
+    <Compile Include="Expression\DateAccrual.fs" />
     <Compile Include="Expression\Parser.fs" />
     <Compile Include="Elements\Enumeration.fs" />
     <Compile Include="Elements\Structure.fs" />

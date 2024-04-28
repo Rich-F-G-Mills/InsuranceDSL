@@ -33,14 +33,11 @@ module BooleanAccrualExpression =
 
     let internal parse (expressionParser: IExpressionParser, callableFactory: CallableFactory) =
 
-        // The following was (somewhat) inspired by... https://karmin.ch/ebnf/examples
-        // We need to create a ref backed parser to due the underlying circularity.
         let (EXPRESSION, EXPRESSION_REF) =
             createParserForwardedToRef<BooleanAccrualExpression, unit> ()
 
-        // In theory this could be defined outside as independent of the parameters.
-        let CONSTANT =
-            BOOLEAN_CONSTANT |>> BooleanAccrualExpression.Constant
+        let LITERAL =
+            BOOLEAN_LITERAL |>> BooleanAccrualExpression.Constant
 
         let VARIABLE =
             parse {
@@ -74,7 +71,7 @@ module BooleanAccrualExpression =
         let ELEMENT =
             let choices =
                 [
-                    CONSTANT
+                    LITERAL
                     VARIABLE
                     CALLABLE
                     PARENTHESES
@@ -84,6 +81,7 @@ module BooleanAccrualExpression =
 
         let EQUATABLE_EXPRESSION =
             let makeChoice p mapper : Parser<BooleanAccrualExpression, unit> =
+                // We use attempt to that we can completely backtrack as necessary.
                 attempt (pipe5 p spaces BINARY_EQUATABLE_OP spaces p (fun lhs _ op _ rhs ->
                     BooleanAccrualExpression.BinaryEquatable (op, mapper (lhs, rhs))))
 
@@ -116,11 +114,20 @@ module BooleanAccrualExpression =
 
             choice choices
 
+        let CONDITIONAL =
+            let folder (condition, ifTrue) ifFalse =
+                BooleanAccrualExpression.Conditional (condition, ifTrue, ifFalse)
+
+            MAKE_CONDITIONAL (EXPRESSION, EXPRESSION, folder)  
+
         do EXPRESSION_REF.Value <-
             let choices =
-                [                    
+                [      
+                    CONDITIONAL
                     EQUATABLE_EXPRESSION
-                    COMPARABLE_EXPRESSION 
+                    COMPARABLE_EXPRESSION
+                    // This needs to come after the equatable and comparable expressions
+                    // above which permit back-tracking.
                     ELEMENT
                 ]
 

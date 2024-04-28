@@ -9,7 +9,6 @@ namespace OpenCL.NET.Interop
         /// <summary>
         /// Describes the type of global memory cache supported.
         /// </summary>
-        [Flags]
         public enum DeviceGlobalMemoryCacheType : UInt32
         {
             None = 0x0,

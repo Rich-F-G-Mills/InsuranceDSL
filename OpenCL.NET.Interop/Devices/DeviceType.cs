@@ -4,7 +4,7 @@ namespace OpenCL.NET.Interop
     public static partial class Devices
     {
         // Type alias defined: https://github.com/KhronosGroup/OpenCL-Headers/blob/2368105c0531069fe927989505de7d125ec58c55/CL/cl.h#L42C9-L42C29
-        // Levels defined: https://github.com/KhronosGroup/OpenCL-Headers/blob/2368105c0531069fe927989505de7d125ec58c55/CL/cl.h#L307-L431
+        // Levels defined: https://github.com/KhronosGroup/OpenCL-Headers/blob/2368105c0531069fe927989505de7d125ec58c55/CL/cl.h#L296-L304
 
         [Flags]
         public enum DeviceType : UInt64

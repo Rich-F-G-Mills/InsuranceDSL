@@ -11,7 +11,7 @@ module Platforms =
 
 
     type PlatformId =
-        internal PlatformId of nativeint
+        internal PlatformId of IntPtr
 
     let getPlatformIds () =
         result {
@@ -34,8 +34,14 @@ module Platforms =
         | [<MapFromString("FULL_PROFILE")>] Full
         | [<MapFromString("EMBEDDED_PROFILE")>] Embedded
 
-        static member val internal ofNativeStrict =
+    [<RequireQualifiedAccess>]
+    module PlatformProfile =
+        // Ideally this would be an auto-implemented static property of the type itself.
+        // However, a null-reference exception is raised. Likely due to DU item not being ready
+        // at time of construction?
+        let internal ofNativeStrict =
             createStrictMapperFromNativeToType<string, PlatformProfile>
+
 
     type PlatformVersion =
         { 
@@ -43,6 +49,10 @@ module Platforms =
             Minor: int
             Information: string
         }
+
+
+    type private NativePlatformInformation =
+        Interop.Platforms.PlatformInformation
 
     type PlatformInformation =
         {
@@ -52,7 +62,6 @@ module Platforms =
             Vendor: string
             Extensions: string list
         }
-
 
     let private reVersion =
         new Regex (@"^OpenCL\s([0-9]+)\.([0-9]+)\s(.*)$")
@@ -64,11 +73,11 @@ module Platforms =
                     Interop.Platforms.GetPlatformInformation (platformId, name, size, buffer))
 
             let! profile =
-                getInfoElementString Interop.Platforms.PlatformInformation.Profile
+                getInfoElementString NativePlatformInformation.Profile
                 |> Result.map PlatformProfile.ofNativeStrict
 
             and! versionRaw =
-                getInfoElementString Interop.Platforms.PlatformInformation.Version
+                getInfoElementString NativePlatformInformation.Version
                 
             let versionMatch =
                 reVersion.Match versionRaw
@@ -82,13 +91,13 @@ module Platforms =
                     | _ -> failwith (sprintf "Unable to process version string '%s'." versionRaw)
 
             let! name =
-                getInfoElementString Interop.Platforms.PlatformInformation.Name
+                getInfoElementString NativePlatformInformation.Name
 
             and! vendor =
-                getInfoElementString Interop.Platforms.PlatformInformation.Vendor
+                getInfoElementString NativePlatformInformation.Vendor
 
             and! extensions =
-                getInfoElementString Interop.Platforms.PlatformInformation.Extensions
+                getInfoElementString NativePlatformInformation.Extensions
                 |> Result.map (fun s -> s.Split (" ", StringSplitOptions.RemoveEmptyEntries))
                 |> Result.map Array.toList
 

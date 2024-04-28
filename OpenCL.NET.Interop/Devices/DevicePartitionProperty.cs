@@ -9,7 +9,7 @@ namespace OpenCL.NET.Interop
         /// <summary>
         /// Represents an enumeration for the different device partition properties.
         /// </summary>
-        public enum DevicePartitionProperty : uint
+        public enum DevicePartitionProperty : UInt32
         {
             /// <summary>
             /// Partitions the device equally among sub-devices.

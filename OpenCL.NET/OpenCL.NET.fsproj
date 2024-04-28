@@ -11,6 +11,8 @@
     <Compile Include="Common.fs" />
     <Compile Include="Platforms.fs" />
     <Compile Include="Devices.fs" />
+    <Compile Include="Contexts.fs" />
+    <Compile Include="Programs.fs" />
   </ItemGroup>
 
   <ItemGroup>

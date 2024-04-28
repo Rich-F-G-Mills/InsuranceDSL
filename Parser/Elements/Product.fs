@@ -132,6 +132,9 @@ module internal Product =
                     | VariableType.StringEnumeration se ->
                         Variable.StringEnumerationSingleton { Name = variableName; Definition = se }
 
+                | VariableMode.Input ->
+                    failwith "Unexpected error... Input variables should not be defined in this way."
+
             return { Name = variableName; Variable = newVariable; Content = variableContent }
         }
 
@@ -215,7 +218,11 @@ module internal Product =
                     | Variable.IntegerAccrual v ->
                         applyParser expressionParser'.INTEGER_ACCRUAL_EXPRESSION v npv DefinedVariable.buildFrom
                     | Variable.RealAccrual v ->
-                        applyParser expressionParser'.REAL_ACCRUAL_EXPRESSION v npv DefinedVariable.buildFrom)
+                        applyParser expressionParser'.REAL_ACCRUAL_EXPRESSION v npv DefinedVariable.buildFrom
+                    | Variable.StringAccrual v ->
+                        applyParser expressionParser'.STRING_ACCRUAL_EXPRESSION v npv DefinedVariable.buildFrom
+                    | Variable.DateAccrual v ->
+                        applyParser expressionParser'.DATE_ACCRUAL_EXPRESSION v npv DefinedVariable.buildFrom)
                 |> Seq.sequenceResultM
                 |> Result.map Map.ofSeq
 

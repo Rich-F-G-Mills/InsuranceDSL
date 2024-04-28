@@ -54,6 +54,8 @@ module Attributes =
             | None -> failwith (sprintf "Unable to map '%A' to target type '%s'." from typeof<'T2>.Name)
 
     let createMapperFromNativeToType<'TSource, 'TTarget when 'TSource:comparison and 'TTarget:comparison> =
+        // do printfn "Creating mapper from native '%s' to '%s'." typeof<'TSource>.Name typeof<'TTarget>.Name
+        
         let cases =
             getMappingsForType<'TSource, 'TTarget>
             |> Map.ofArray
@@ -65,6 +67,8 @@ module Attributes =
         makeStrict createMapperFromNativeToType<'TSource, 'TTarget>
 
     let createMapperToNativeFromType<'TSource, 'TTarget when 'TSource:comparison and 'TTarget:comparison> =
+        // do printfn "Creating mapper to native '%s' from '%s'." typeof<'TSource>.Name typeof<'TTarget>.Name
+        
         let cases =
             getMappingsForType<'TSource, 'TTarget>
             |> Seq.map (fun (s, t) -> t, s)

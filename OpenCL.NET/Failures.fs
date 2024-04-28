@@ -296,5 +296,7 @@ type CLFailure =
     /// </summary>
     | [<MapFromNativeCLResult(NativeCLResult.InvalidPartitionNameExt)>] InvalidPartitionNameExt
 
-    static member val ofNativeStrict =
+[<RequireQualifiedAccess>]
+module CLFailure =
+    let internal ofNativeStrict =
         createStrictMapperFromNativeToType<NativeCLResult, CLFailure>

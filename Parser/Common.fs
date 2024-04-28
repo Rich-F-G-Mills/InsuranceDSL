@@ -48,6 +48,7 @@ module internal Common =
     let inline internal (.>|*>.) p1 p2 =
         p1 .>> spaces .>>. p2
 
+    /// Ensures that the string must be followed by either whitespace of EOF.
     let skipString' str: Parser<unit, ParserState> =
         skipString str >.> followedByL (WHITESPACE <|> eof) "Whitespace or EOF expected."
 
@@ -146,7 +147,7 @@ module internal Common =
         choice callableParsers
 
 
-    // Here we want to ensure that noone uses a name that corresponds to a keyword or callable.
+    /// Ensures that a name does not correspond to a keyword or callable.
     let internal ELEMENT_NAME: Parser<string, ParserState> =
         let expected =
             regexL "[a-zA-Z_][a-zA-Z0-9_]*" "Element name not properly formatted."
@@ -170,6 +171,7 @@ module internal Common =
             STRING >>% VariableType.String
         ]
 
+        // We need the parser state so that we can add in user defined enumerations.
         fun (ParserState parsedElements) ->
             let userTypes =
                 parsedElements

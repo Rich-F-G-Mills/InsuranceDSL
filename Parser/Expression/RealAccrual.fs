@@ -36,8 +36,8 @@ module RealAccrualExpression =
         let (EXPRESSION, EXPRESSION_REF) =
             createParserForwardedToRef<RealAccrualExpression, unit> ()
 
-        let CONSTANT =
-            REAL_CONSTANT |>> RealAccrualExpression.Constant
+        let LITERAL =
+            REAL_LITERAL |>> RealAccrualExpression.Constant
 
         let VARIABLE =
             parse {
@@ -71,7 +71,7 @@ module RealAccrualExpression =
         let FACTOR =
             let choices =
                 [
-                    CONSTANT                    
+                    LITERAL                    
                     VARIABLE
                     CALLABLE
                     PARENTHESES

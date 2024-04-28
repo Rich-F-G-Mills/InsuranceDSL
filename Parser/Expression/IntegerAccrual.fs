@@ -30,14 +30,17 @@ module IntegerAccrualExpression =
         let internal MOD (expr1, expr2) =
             IntegerAccrualExpression.BinaryArithmeticOp (BinaryArithmeticOp.Modulus, expr1, expr2)
 
+        [<Callable>]
+        let internal LEN expr =
+            IntegerAccrualExpression.StringLength expr
 
     let internal parse (expressionParser: IExpressionParser, callableFactory: CallableFactory) =
 
         let (EXPRESSION, EXPRESSION_REF) =
             createParserForwardedToRef<IntegerAccrualExpression, unit> ()
 
-        let CONSTANT =
-            INTEGER_CONSTANT |>> IntegerAccrualExpression.Constant
+        let LITERAL =
+            INTEGER_LITERAL |>> IntegerAccrualExpression.Constant
 
         let VARIABLE =
             parse {
@@ -60,6 +63,7 @@ module IntegerAccrualExpression =
                     callableFactory.MakeCallable1 Callables.ABS
                     callableFactory.MakeCallable2 Callables.MOD
                     callableFactory.MakeCallable1 Callables.INT
+                    callableFactory.MakeCallable1 Callables.LEN
                 ]
                 |> Map.ofSeq
                 
@@ -71,7 +75,7 @@ module IntegerAccrualExpression =
         let FACTOR =
             let choices =
                 [
-                    CONSTANT                    
+                    LITERAL                    
                     VARIABLE
                     CALLABLE
                     PARENTHESES

@@ -93,8 +93,8 @@ module (*internal*) UnifiedDependencies =
 
                     VariableByMode.fromUnderlying d, ps'
 
-            List.map typeMapper
-            >> Map.ofList
+            Map.ofList << List.map typeMapper
+            
 
     // The pairings are considered complete if a dependency definition exists for all
     // non-input precedents that appear at least once. We only allow this type to be 
